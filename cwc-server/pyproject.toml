@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "cwc-server"
+version = "0.1.0"
+description = ""
+authors = ["bensteinberg <bsteinberg@law.harvard.edu>"]
+readme = "README.md"
+packages = [{include = "cwc_server", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+quart = "^0.19.6"
+
+[tool.poetry.scripts]
+start = "cwc_server:run"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.24.0"
+flake8 = "^7.1.1"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
