@@ -4,6 +4,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 
+import { useWebSocket } from '@vueuse/core'
+
 import _morse from '../morse-code.json'
 
 interface MorseMapping {
@@ -31,11 +33,14 @@ const dashLength = computed(() => {
     return 3 * ditLength.value
 })
 
-const ws = new WebSocket(import.meta.env.VITE_WEBSOCKET)
-
-ws.addEventListener('message', function (event) {
-    let morseMessage = textToMorse(event.data)
-    playMorse(morseMessage)
+const { ws } = useWebSocket(import.meta.env.VITE_WEBSOCKET, {
+    autoReconnect: true,
+    onConnected:(webSocket)=>{
+        webSocket.addEventListener('message', function (event) {
+            let morseMessage = textToMorse(event.data)
+            playMorse(morseMessage)
+        })
+    },
 })
 
 interface Morse {
@@ -56,10 +61,10 @@ function textToMorse(text: string) {
     )
 }
 
-function send() {
+function sendMessage() {
     const msg = message.value
     if (msg) {
-        ws.send(msg)
+        ws.value!.send(msg)
     }
     message.value = ""
     return false
@@ -91,7 +96,7 @@ watch(frequency, (newFrequency) => {
 
 watch(volume, (newVolume) => {
     if (newVolume !== 0.0) {  
-        if (!audioContextInitialized) {
+        if (!audioContextInitialized.value) {
             initializeAudioContext()
         }
     }
@@ -99,7 +104,7 @@ watch(volume, (newVolume) => {
 
 watch(playing, (newPlaying) => {
     if (newPlaying) {  
-        if (!audioContextInitialized) {
+        if (!audioContextInitialized.value) {
             initializeAudioContext()
         }
     }
@@ -167,7 +172,7 @@ async function playMorse(word: MorseList) {
   <h1>cwc</h1>
   <div class="grid">
     <div>
-      <input type="text" name="message" minlength="1" v-model="message" @keyup.enter="send"/>
+      <input type="text" name="message" minlength="1" v-model="message" @keyup.enter="sendMessage"/>
     </div>
     <div id="messages">
       <p v-if="decode" class="message"></p>
