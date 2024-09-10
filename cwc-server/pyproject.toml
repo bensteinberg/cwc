@@ -2,8 +2,7 @@
 name = "cwc-server"
 version = "0.1.0"
 description = ""
-authors = ["bensteinberg <bsteinberg@law.harvard.edu>"]
-readme = "README.md"
+authors = ["Ben Steinberg <ben@ac1fg.org>"]
 packages = [{include = "cwc_server", from = "src"}]
 
 [tool.poetry.dependencies]
