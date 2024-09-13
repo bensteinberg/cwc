@@ -57,8 +57,9 @@ then run
 npm run build
 ```
 
-Copy the repo's contents, without `node_modules/`, to the machine
-where you'll be serving it.
+Copy the repo's contents, optionally without
+`cwc-client/node_modules/` or `.git/`, to the machine where you'll be
+serving it.
 
 Run the application like this
 
@@ -66,7 +67,39 @@ Run the application like this
 poetry run hypercorn cwc_server:app
 ```
 
-TODO: example nginx stanza and systemd service file
+A systemd service file could look something like
+
+```
+[Unit]
+Description=Continuous Wave Chat
+After=network.target
+
+[Service]
+User=you
+WorkingDirectory=/path/to/cwc-main/cwc-server
+ExecStart=/path/to/.local/bin/poetry run hypercorn cwc_server:app
+Type=simple
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+The stanza for an nginx reverse proxy might include
+
+```
+location / {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $host;
+    proxy_http_version 1.1;
+    proxy_buffering off;
+    proxy_read_timeout 20m;
+    proxy_pass http://127.0.0.1:8000/;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+```
 
 ## Future work
 
