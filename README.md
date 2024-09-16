@@ -109,7 +109,6 @@ Features that may be added later include
   turned off, or queue them for a limited amount of time
 - better/controllable declicking of audio
 - a decoder and keyer allowing input in Morse via keyboard or key
-- channels: a simulation of different radio frequencies
 - a mechanism for including messages from external sources, like Slack
 - some mechanism for auth
 - serve both parts of the application from a subdirectory

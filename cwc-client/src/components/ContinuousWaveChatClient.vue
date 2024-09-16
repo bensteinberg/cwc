@@ -23,6 +23,9 @@ const playing = ref(false)
 const audioContextInitialized = ref(false)
 const volume = ref(0.0)
 
+const channels = [...Array(16).keys()]
+const channel = ref(0)
+
 const paris = 50
 
 const ditLength = computed(() => {
@@ -36,9 +39,11 @@ const dashLength = computed(() => {
 const { ws } = useWebSocket(import.meta.env.VITE_WEBSOCKET, {
     autoReconnect: true,
     onConnected:(webSocket)=>{
-        webSocket.addEventListener('message', function (event) {
-            let morseMessage = textToMorse(event.data)
-            playMorse(morseMessage)
+       webSocket.addEventListener('message', function (event) {
+            let transmission = JSON.parse(event.data)
+            if (transmission.channel === channel.value) {
+                playMorse(textToMorse(transmission.message))
+            }
         })
     },
 })
@@ -64,7 +69,12 @@ function textToMorse(text: string) {
 function sendMessage() {
     const msg = message.value
     if (msg) {
-        ws.value!.send(msg)
+        ws.value!.send(JSON.stringify(
+            {
+                "channel": channel.value,
+                "message": msg
+            }
+        ))
     }
     message.value = ""
     return false
@@ -179,6 +189,14 @@ async function playMorse(word: MorseList) {
     </div>
   </div>
   <div id="settings">
+    <label>
+      Channel
+      <select name="channel" v-model="channel">
+        <option v-for="c in channels" :value="c" :key="c">
+          {{ c }}
+        </option>
+      </select>
+    </label>
     <label>
       WPM: {{ wpm }}
       <input type="range" v-model="wpm" name="WPM">
