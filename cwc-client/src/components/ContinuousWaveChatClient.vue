@@ -26,7 +26,9 @@ const volume = ref(0.0)
 const channels = [...Array(16).keys()]
 const channel = ref(0)
 
-const paris = 50
+const paris = morseToDits(textToMorse("paris "))
+
+console.assert(paris === 50, "Paris is not 50!")
 
 const ditLength = computed(() => {
     return (60 * 1000) / (wpm.value * paris)
@@ -64,6 +66,17 @@ function textToMorse(text: string) {
             }
         }
     )
+}
+
+function morseToDits(characters: MorseList) {
+    let characterCount = characters.length
+    let nonSpaceCharacters = characters.filter((c) => c.morse !== "/")
+    let intraCharacterSpaces = nonSpaceCharacters.map((c) => c.morse.length - 1).reduce((partialSum, a) => partialSum + a, 0)
+    let spaces = characterCount - nonSpaceCharacters.length
+    let interCharacterSpaces = nonSpaceCharacters.length - 1
+    let allDits = nonSpaceCharacters.map((c) => c.morse.split(".").length - 1).reduce((partialSum, a) => partialSum + a, 0)
+    let allDashes = nonSpaceCharacters.map((c) => c.morse.split("-").length - 1).reduce((partialSum, a) => partialSum + a, 0)
+    return allDits + (3 * allDashes) + (7 * spaces) + intraCharacterSpaces + (3 * interCharacterSpaces)
 }
 
 function sendMessage() {
