@@ -1,7 +1,7 @@
 import asyncio
-import os
+import json
 
-from quart import Quart, render_template, websocket, send_from_directory
+from quart import Quart, render_template, websocket, send_from_directory, request, abort
 
 from cwc_server.broker import Broker
 
@@ -47,3 +47,28 @@ async def ws() -> None:
     finally:
         task.cancel()
         await task
+
+
+@app.post("/api/v1/send")
+async def api_send() -> None:
+    try:
+        content_type = request.headers.get('Content-Type')
+        if content_type == 'application/json':
+            transmission = await request.get_json()
+            message = json.dumps(
+                {
+                    "channel": transmission["channel"],
+                    "message": transmission["message"]
+                }
+            )
+        else:
+            message = json.dumps(
+                {
+                    "channel": int((await request.form)["channel"]),
+                    "message": (await request.form)["message"]
+                }
+            )
+        await broker.publish(message)
+        return "", 200
+    except KeyError:
+        abort(400)
