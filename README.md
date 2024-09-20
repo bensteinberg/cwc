@@ -40,6 +40,18 @@ npm run dev
 You should then be able to visit http://localhost:5173/ to use the
 application.
 
+To test "simultaneous" transmissions, with one message per line in `msgs.txt`, you can use the back-end API like this:
+
+```
+cat msgs.txt | parallel curl -X POST -d "channel=0" -d "message={}" "http://127.0.0.1:5000/api/v1/send
+```
+
+or, hitting the front end instead, after running `poetry run playwright install`:
+
+```
+cat msgs.txt | parallel poetry run python tests/send.py
+```
+
 ## Deployment
 
 (This is work in progress.)
