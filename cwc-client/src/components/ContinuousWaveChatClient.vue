@@ -18,7 +18,9 @@ const message = ref("")
 const frequency = ref(700)
 const wpm = ref(25)
 const decode = ref(true)
+const play = ref(false)
 const playing = ref(false)
+const messageQueue = ref<string[]>([])
 
 const audioContextInitialized = ref(false)
 const volume = ref(0.0)
@@ -44,11 +46,29 @@ const { ws } = useWebSocket(import.meta.env.VITE_WEBSOCKET, {
        webSocket.addEventListener('message', function (event) {
             let transmission = JSON.parse(event.data)
             if (transmission.channel === channel.value) {
-                playMorse(textToMorse(transmission.message))
+                messageQueue.value.push(transmission.message)
+                if (!(playing.value)) {
+                    playing.value = true
+                    playNext()
+                }
             }
         })
     },
 })
+
+function playNext() {
+    try {
+        let transmission = messageQueue.value.shift()
+        if (transmission) {
+            let msg = textToMorse(transmission)
+            playing.value = true
+            setTimeout(function() {playing.value = false ; playNext()}, 7 * dashLength.value + morseToDits(msg) * ditLength.value)
+            playMorse(msg)
+        }
+    } catch(error) {
+        console.log(error)
+    }
+}
 
 interface Morse {
     character: string, morse: string
@@ -125,8 +145,8 @@ watch(volume, (newVolume) => {
     }
 })
 
-watch(playing, (newPlaying) => {
-    if (newPlaying) {  
+watch(play, (newPlay) => {
+    if (newPlay) {
         if (!audioContextInitialized.value) {
             initializeAudioContext()
         }
@@ -160,7 +180,7 @@ async function playDot() {
 }
 
 async function playLetter(letter: Morse) {
-    if (!playing.value) {
+    if (!play.value) {
         return
     }
     if (!audioContextInitialized.value) {
@@ -187,6 +207,7 @@ async function playMorse(word: MorseList) {
         await playLetter(word[i])
         await sleep(dashLength.value)
     }
+
 }
 
 </script>
@@ -224,7 +245,7 @@ async function playMorse(word: MorseList) {
     </label>
     <label>
       Play
-      <input name="play" type="checkbox" role="switch" v-model="playing"/>
+      <input name="play" type="checkbox" role="switch" v-model="play"/>
     </label>
     <label>
       “decode”

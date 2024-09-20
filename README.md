@@ -105,8 +105,6 @@ location / {
 
 Features that may be added later include
 
-- a toggle for QSK aka full break-in; this might queue messages when
-  turned off, or queue them for a limited amount of time
 - better/controllable declicking of audio
 - a decoder and keyer allowing input in Morse via keyboard or key
 - a mechanism for including messages from external sources, like Slack
