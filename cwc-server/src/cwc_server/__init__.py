@@ -1,15 +1,22 @@
 import asyncio
 import json
 
-from quart import Quart, render_template, websocket, send_from_directory, request, abort
+from quart import (
+    Quart,
+    render_template,
+    websocket,
+    send_from_directory,
+    request,
+    abort
+)
 
 from cwc_server.broker import Broker
 
 
 app = Quart(
     __name__,
-    static_folder = "../../../cwc-client/dist/assets",
-    template_folder = "../../../cwc-client/dist"
+    static_folder="../../../cwc-client/dist/assets",
+    template_folder="../../../cwc-client/dist"
 )
 
 
@@ -20,6 +27,7 @@ def run() -> None:
 @app.get("/")
 async def index():
     return await render_template("index.html")
+
 
 @app.route('/favicon.ico')
 async def favicon():
