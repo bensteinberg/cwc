@@ -2,16 +2,25 @@
 </style>
 
 <script setup lang="ts">
+// imports
 import { ref, computed, watch } from 'vue'
 
 import { useWebSocket } from '@vueuse/core'
 
 import _morse from '../morse-code.json'
 
+// interfaces
 interface MorseMapping {
     [key: string]: string
 }
 
+interface Morse {
+    character: string, morse: string
+}
+
+export interface MorseList extends Array<Morse> { }
+
+// reactive "constants"
 const morse: MorseMapping = _morse
 
 const message = ref("")
@@ -40,6 +49,7 @@ const dashLength = computed(() => {
     return 3 * ditLength.value
 })
 
+// set up websocket
 const { ws } = useWebSocket(import.meta.env.VITE_WEBSOCKET, {
     autoReconnect: true,
     onConnected:(webSocket)=>{
@@ -70,12 +80,7 @@ function playNext() {
     }
 }
 
-interface Morse {
-    character: string, morse: string
-}
-
-export interface MorseList extends Array<Morse> { }
-
+// Morse functions
 function textToMorse(text: string) {
     return text.toLowerCase().split('').filter(c => c in morse || c === " ").map(
         function(c) {
@@ -99,6 +104,7 @@ function morseToDits(characters: MorseList) {
     return allDits + (3 * allDashes) + (7 * spaces) + intraCharacterSpaces + (3 * interCharacterSpaces)
 }
 
+// action on enter in text input
 function sendMessage() {
     const msg = message.value
     if (msg) {
@@ -113,6 +119,7 @@ function sendMessage() {
     return false
 }
 
+// audio context setup
 let note_context
 let note_node: OscillatorNode
 let gain_node: GainNode
@@ -153,6 +160,7 @@ watch(play, (newPlay) => {
     }
 })
 
+// functions for playing dots and dashes and combinations
 function startNotePlaying() {
     // Pass a start time of 0 so it starts ramping up immediately.
     gain_node.gain.setTargetAtTime(volume.value, 0, 0.01)
