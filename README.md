@@ -71,7 +71,8 @@ npm run build
 
 Copy the repo's contents, optionally without
 `cwc-client/node_modules/` or `.git/`, to the machine where you'll be
-serving it.
+serving it; also copy `cwc-client/public/favicon.ico` to
+`cwc-client/dist/assets`, where the Quart application is expecting to find it.
 
 Run the application like this
 
