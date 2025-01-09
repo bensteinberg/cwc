@@ -7,7 +7,7 @@ packages = [{include = "cwc_server", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-quart = "^0.19.6"
+quart = "^0.20.0"
 
 [tool.poetry.scripts]
 start = "cwc_server:run"
