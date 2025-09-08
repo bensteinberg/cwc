@@ -108,10 +108,10 @@ function morseToDits(characters: MorseList) {
     let groupedWhitespace = 0
     let lastCharacter = null
     for (let i = 0 ; i < characters.length ; i++) {
-	if (characters[i].morse === "/" && lastCharacter !== "/") {
-	    groupedWhitespace++
-	}
-	lastCharacter = characters[i].morse
+        if (characters[i].morse === "/" && lastCharacter !== "/") {
+            groupedWhitespace++
+        }
+        lastCharacter = characters[i].morse
     }
     let interCharacterSpaces = nonSpaceCharacters.length - groupedWhitespace
     let allDits = nonSpaceCharacters.map((c) => c.morse.split(".").length - 1).reduce((partialSum, a) => partialSum + a, 0)
