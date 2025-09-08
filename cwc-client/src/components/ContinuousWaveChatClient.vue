@@ -39,7 +39,13 @@ const channel = ref(0)
 
 const paris = morseToDits(textToMorse("paris "))
 
-console.assert(paris === 50, "Paris is not 50!")
+// is there something like doctest?
+// console.assert(paris === 50, "Paris is not 50!")
+// console.assert(morseToDits(textToMorse("codex ")) === 60, "Codex is not 60!")
+// console.assert(morseToDits(textToMorse("paris ".repeat(5))) === 250, "5x Paris is not 250!")
+// console.assert(morseToDits(textToMorse("paris  ".repeat(5))) === 285, "5x Paris with extra spaces is not 285!")
+
+
 
 const ditLength = computed(() => {
     return (60 * 1000) / (wpm.value * paris)
@@ -98,7 +104,16 @@ function morseToDits(characters: MorseList) {
     let nonSpaceCharacters = characters.filter((c) => c.morse !== "/")
     let intraCharacterSpaces = nonSpaceCharacters.map((c) => c.morse.length - 1).reduce((partialSum, a) => partialSum + a, 0)
     let spaces = characterCount - nonSpaceCharacters.length
-    let interCharacterSpaces = nonSpaceCharacters.length - 1
+    // there must be a better way to do this
+    let groupedWhitespace = 0
+    let lastCharacter = null
+    for (let i = 0 ; i < characters.length ; i++) {
+	if (characters[i].morse === "/" && lastCharacter !== "/") {
+	    groupedWhitespace++
+	}
+	lastCharacter = characters[i].morse
+    }
+    let interCharacterSpaces = nonSpaceCharacters.length - groupedWhitespace
     let allDits = nonSpaceCharacters.map((c) => c.morse.split(".").length - 1).reduce((partialSum, a) => partialSum + a, 0)
     let allDashes = nonSpaceCharacters.map((c) => c.morse.split("-").length - 1).reduce((partialSum, a) => partialSum + a, 0)
     return allDits + (3 * allDashes) + (7 * spaces) + intraCharacterSpaces + (3 * interCharacterSpaces)
