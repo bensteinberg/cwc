@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cwc-server"
-version = "0.1.5"
+version = "0.1.6"
 description = ""
 authors = ["Ben Steinberg <ben@ac1fg.org>"]
 packages = [{include = "cwc_server", from = "src"}]
